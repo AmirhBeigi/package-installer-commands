@@ -1,5 +1,5 @@
 {
-  "name": "package installer command",
+  "name": "package installer commands",
   "description": "From now on, it can be installed with all package managers",
   "version": "1.0",
   "manifest_version": 3,
