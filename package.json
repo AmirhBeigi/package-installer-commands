@@ -14,7 +14,7 @@
     "chrome"
   ],
   "author": "Amirhbeigi",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "typescript": "^4.6.4"
   }
