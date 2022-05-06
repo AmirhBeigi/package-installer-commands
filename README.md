@@ -1,6 +1,6 @@
 # Package installer commands
 
-From now on, it can be installed with all package managers!
+From now on, it can be installed with all package managers in npmjs.com.
 ![package installer commands](https://github.com/AmirhBeigi/package-installer-commands/blob/main/cover.png?raw=true)
 
 ## Run Locally
