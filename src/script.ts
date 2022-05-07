@@ -63,6 +63,12 @@ const getCss = () => `
   input:focus + .slider {
     box-shadow: 0 0 1px #000;
   }
+  .pic-switch-toggles {
+    gap: 1rem;
+  }
+  .st_toggle {
+    gap: 0.5rem;
+  }
   
   input:checked + .slider:before {
     -webkit-transform: translateX(15px);
@@ -72,25 +78,32 @@ const getCss = () => `
 
 document.head.insertAdjacentHTML("beforeend", `<style>${getCss()}</style>`);
 
-let isDev = false;
-const installers = {
-  pnpm: {
-    dev: "pnpm i -D",
-    prod: "pnpm i",
+let togglesState: any = {
+  isDev: false,
+  isOptional: false
+}
+
+const packageManagers = {
+  installers: {
+    pnpm: "i",
+    yarn: "add",
+    npm: "i",
   },
-  yarn: {
-    dev: "yarn add -D",
-    prod: "yarn add",
+  dev: {
+    pnpm: "-D",
+    yarn: "-D",
+    npm: "-D",
   },
-  npm: {
-    dev: "npm i -D",
-    prod: "npm i",
+  optional: {
+    npm: "-O",
+    yarn: "-O",
+    pnpm: "-O",
   },
 };
 
-type Manager = keyof typeof installers;
+type Manager = keyof typeof packageManagers.installers;
 
-const packageManager = Object.keys(installers) as Manager[];
+const packageManager = Object.keys(packageManagers.installers) as Manager[];
 
 const sidebarEl = document.querySelector(
   "#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l"
@@ -100,19 +113,37 @@ const packageBoxEl = document.getElementById("package-box");
 const packageName = location.pathname.split("/").splice(2).join("/");
 const toastContainer = document.createElement("div");
 toastContainer.id = "toasts";
-document.querySelector("#app > div")?.insertAdjacentElement("afterbegin", toastContainer);
+document
+  .querySelector("#app > div")
+  ?.insertAdjacentElement("afterbegin", toastContainer);
 
 const cleanUp = () => {
   document
-    .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p")
+    .querySelector(
+      "#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p"
+    )
     ?.remove();
   document
-    .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3")
+    .querySelector(
+      "#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3"
+    )
     ?.remove();
 };
 
 cleanUp();
-
+function generateCommand(
+  manager: Manager,
+  options: { isDev: boolean; isOptional: boolean } = {
+    isDev: togglesState.isDev,
+    isOptional: togglesState.isOptional,
+  }
+) {
+  let commands: string[] = [manager, packageManagers.installers[manager]];
+  if (options.isDev) commands.push(packageManagers.dev[manager]);
+  if (options.isOptional) commands.push(packageManagers.optional[manager] || '');
+  commands.push(packageName);
+  return commands.join(" ");
+}
 const copyToClipboard = (str: string) => {
   if (navigator && navigator.clipboard && navigator.clipboard.writeText)
     return navigator.clipboard.writeText(str);
@@ -132,36 +163,38 @@ const toast = ({ text }: { text: string }) => {
   toast.classList.add("toast");
   toast.innerHTML = `<pre>${text}</pre>`;
   toastContainer.appendChild(toast);
+  toast.addEventListener("click", () => {
+    toast.remove();
+  });
   setTimeout(() => {
     toast.remove();
   }, 2000);
 };
 
-const switchButton = () => `<label class="switch">
+const isDevSwitchButton = () => `<label class="switch">
   <input id="devDependenciesToggleButton" type="checkbox">
+  <span class="slider"></span>
+</label>`;
+const isOptionalSwitchButton = () => `<label class="switch">
+  <input id="optionalToggleButton" type="checkbox">
   <span class="slider"></span>
 </label>`;
 
 const header = () => `<div class="flex justify-between items-center">
   <h3 class="c84e15be f5 mt0 mb0">Install</h3>
-  <div class="flex items-center">
-    <span class="mr1 f5">is Dev</span>${switchButton()}
+  <div class="flex items-center pic-switch-toggles">
+    <span class="mr1 f5 flex items-center st_toggle">is Dev${isDevSwitchButton()}</span>
+    <span class="mr1 f5 flex items-center st_toggle">is Optional${isOptionalSwitchButton()}</span>
   </div>
 </div>`;
 
-const renderInstallPackageBox = ({
-  manager,
-  name,
-  isDev,
-}: {
-  manager: Manager;
-  name: string;
-  isDev: boolean;
-}) => {
+const renderInstallPackageBox = (manager: Manager) => {
+  const command = generateCommand(manager);
+
   return `<p id="${manager}-box" class="d767adf4 lh-copy truncate ph0 mb3 black-80 b5be2af6 f6 flex flex-row">
     <svg viewBox="0 0 12.32 9.33"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>
     <code class="flex-auto truncate db" title="Copy Command to Clipboard">
-    <span role="button" tabindex="0">${installers[manager][isDev ? "dev" : "prod"]} ${name}</span>
+    <span role="button" tabindex="0">${command}</span>
     </code>
     <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="copy" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M433.941 65.941l-51.882-51.882A48 48 0 0 0 348.118 0H176c-26.51 0-48 21.49-48 48v48H48c-26.51 0-48 21.49-48 48v320c0 26.51 21.49 48 48 48h224c26.51 0 48-21.49 48-48v-48h80c26.51 0 48-21.49 48-48V99.882a48 48 0 0 0-14.059-33.941zM266 464H54a6 6 0 0 1-6-6V150a6 6 0 0 1 6-6h74v224c0 26.51 21.49 48 48 48h96v42a6 6 0 0 1-6 6zm128-96H182a6 6 0 0 1-6-6V54a6 6 0 0 1 6-6h106v88c0 13.255 10.745 24 24 24h88v202a6 6 0 0 1-6 6zm6-256h-64V48h9.632c1.591 0 3.117.632 4.243 1.757l48.368 48.368a6 6 0 0 1 1.757 4.243V112z"></path></svg>
 </p>`;
@@ -173,24 +206,32 @@ const installPackageBoxes = () => {
 
     packageBoxEl?.insertAdjacentHTML(
       "afterbegin",
-      renderInstallPackageBox({ manager, name: packageName, isDev })
+      renderInstallPackageBox(manager)
     );
-
-    return document.getElementById(`${manager}-box`)?.addEventListener("click", () =>
-      copyToClipboard(`${installers[manager][isDev ? "dev" : "prod"]} ${packageName}`)?.then(() =>
-        toast({
-          text: `Copied '${
-            installers[manager][isDev ? "dev" : "prod"]
-          } ${packageName}' to clipboard`,
-        })
-      )
-    );
+    const command = generateCommand(manager);
+    return document
+      .getElementById(`${manager}-box`)
+      ?.addEventListener("click", () =>
+        copyToClipboard(command)?.then(() =>
+          toast({
+            text: `Copied '${command}' to clipboard`,
+          })
+        )
+      );
   });
 };
 
 installPackageBoxes();
 sidebarEl?.insertAdjacentHTML("afterbegin", header());
-document.getElementById("devDependenciesToggleButton")?.addEventListener("change", (e: any) => {
-  isDev = e.target.checked;
-  installPackageBoxes();
+
+type Toggle = keyof typeof toggles
+const toggles: any = {
+  isDev: "devDependenciesToggleButton",
+  isOptional: "optionalToggleButton"
+}
+Object.entries(toggles).forEach(([toggle, element]: any) => {
+  document.getElementById(element)?.addEventListener("change", (e: any) => {
+    togglesState[toggle] = e.target.checked;
+    installPackageBoxes();
+  });
 });
