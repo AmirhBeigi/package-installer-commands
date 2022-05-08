@@ -13,6 +13,7 @@ const getCss = () => `
     border-radius: 5px;
     padding: 1rem 2rem;
     margin: 0.5rem;
+    cursor: pointer;
   }
 
   #toasts {
@@ -80,8 +81,8 @@ document.head.insertAdjacentHTML("beforeend", `<style>${getCss()}</style>`);
 
 let togglesState: any = {
   isDev: false,
-  isOptional: false
-}
+  isOptional: false,
+};
 
 const packageManagers = {
   installers: {
@@ -103,7 +104,7 @@ const packageManagers = {
 
 type Manager = keyof typeof packageManagers.installers;
 
-const packageManager = Object.keys(packageManagers.installers) as Manager[];
+const packageManagerNameList = Object.keys(packageManagers.installers) as Manager[];
 
 const sidebarEl = document.querySelector(
   "#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l"
@@ -113,20 +114,14 @@ const packageBoxEl = document.getElementById("package-box");
 const packageName = location.pathname.split("/").splice(2).join("/");
 const toastContainer = document.createElement("div");
 toastContainer.id = "toasts";
-document
-  .querySelector("#app > div")
-  ?.insertAdjacentElement("afterbegin", toastContainer);
+document.querySelector("#app > div")?.insertAdjacentElement("afterbegin", toastContainer);
 
 const cleanUp = () => {
   document
-    .querySelector(
-      "#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p"
-    )
+    .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p")
     ?.remove();
   document
-    .querySelector(
-      "#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3"
-    )
+    .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3")
     ?.remove();
 };
 
@@ -140,7 +135,7 @@ function generateCommand(
 ) {
   let commands: string[] = [manager, packageManagers.installers[manager]];
   if (options.isDev) commands.push(packageManagers.dev[manager]);
-  if (options.isOptional) commands.push(packageManagers.optional[manager] || '');
+  if (options.isOptional) commands.push(packageManagers.optional[manager] || "");
   commands.push(packageName);
   return commands.join(" ");
 }
@@ -201,34 +196,29 @@ const renderInstallPackageBox = (manager: Manager) => {
 };
 
 const installPackageBoxes = () => {
-  packageManager.map((manager: Manager) => {
+  packageManagerNameList.map((manager: Manager) => {
     document.getElementById(`${manager}-box`)?.remove();
 
-    packageBoxEl?.insertAdjacentHTML(
-      "afterbegin",
-      renderInstallPackageBox(manager)
-    );
+    packageBoxEl?.insertAdjacentHTML("afterbegin", renderInstallPackageBox(manager));
     const command = generateCommand(manager);
-    return document
-      .getElementById(`${manager}-box`)
-      ?.addEventListener("click", () =>
-        copyToClipboard(command)?.then(() =>
-          toast({
-            text: `Copied '${command}' to clipboard`,
-          })
-        )
-      );
+    return document.getElementById(`${manager}-box`)?.addEventListener("click", () =>
+      copyToClipboard(command)?.then(() =>
+        toast({
+          text: `Copied '${command}' to clipboard`,
+        })
+      )
+    );
   });
 };
 
 installPackageBoxes();
 sidebarEl?.insertAdjacentHTML("afterbegin", header());
 
-type Toggle = keyof typeof toggles
+type Toggle = keyof typeof toggles;
 const toggles: any = {
   isDev: "devDependenciesToggleButton",
-  isOptional: "optionalToggleButton"
-}
+  isOptional: "optionalToggleButton",
+};
 Object.entries(toggles).forEach(([toggle, element]: any) => {
   document.getElementById(element)?.addEventListener("change", (e: any) => {
     togglesState[toggle] = e.target.checked;

@@ -15,6 +15,7 @@ const getCss = () => `
     border-radius: 5px;
     padding: 1rem 2rem;
     margin: 0.5rem;
+    cursor: pointer;
   }
 
   #toasts {
@@ -80,7 +81,7 @@ const getCss = () => `
 document.head.insertAdjacentHTML("beforeend", `<style>${getCss()}</style>`);
 let togglesState = {
     isDev: false,
-    isOptional: false
+    isOptional: false,
 };
 const packageManagers = {
     installers: {
@@ -99,15 +100,14 @@ const packageManagers = {
         pnpm: "-O",
     },
 };
-const packageManager = Object.keys(packageManagers.installers);
+const packageManagerNameList = Object.keys(packageManagers.installers);
 const sidebarEl = document.querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l");
 sidebarEl === null || sidebarEl === void 0 ? void 0 : sidebarEl.insertAdjacentHTML("afterbegin", `<div id="package-box"></div>`);
 const packageBoxEl = document.getElementById("package-box");
 const packageName = location.pathname.split("/").splice(2).join("/");
 const toastContainer = document.createElement("div");
 toastContainer.id = "toasts";
-(_a = document
-    .querySelector("#app > div")) === null || _a === void 0 ? void 0 : _a.insertAdjacentElement("afterbegin", toastContainer);
+(_a = document.querySelector("#app > div")) === null || _a === void 0 ? void 0 : _a.insertAdjacentElement("afterbegin", toastContainer);
 const cleanUp = () => {
     var _a, _b;
     (_a = document
@@ -124,7 +124,7 @@ function generateCommand(manager, options = {
     if (options.isDev)
         commands.push(packageManagers.dev[manager]);
     if (options.isOptional)
-        commands.push(packageManagers.optional[manager] || '');
+        commands.push(packageManagers.optional[manager] || "");
     commands.push(packageName);
     return commands.join(" ");
 }
@@ -179,22 +179,24 @@ const renderInstallPackageBox = (manager) => {
 </p>`;
 };
 const installPackageBoxes = () => {
-    packageManager.map((manager) => {
+    packageManagerNameList.map((manager) => {
         var _a, _b;
         (_a = document.getElementById(`${manager}-box`)) === null || _a === void 0 ? void 0 : _a.remove();
         packageBoxEl === null || packageBoxEl === void 0 ? void 0 : packageBoxEl.insertAdjacentHTML("afterbegin", renderInstallPackageBox(manager));
         const command = generateCommand(manager);
-        return (_b = document
-            .getElementById(`${manager}-box`)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => { var _a; return (_a = copyToClipboard(command)) === null || _a === void 0 ? void 0 : _a.then(() => toast({
-            text: `Copied '${command}' to clipboard`,
-        })); });
+        return (_b = document.getElementById(`${manager}-box`)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
+            var _a;
+            return (_a = copyToClipboard(command)) === null || _a === void 0 ? void 0 : _a.then(() => toast({
+                text: `Copied '${command}' to clipboard`,
+            }));
+        });
     });
 };
 installPackageBoxes();
 sidebarEl === null || sidebarEl === void 0 ? void 0 : sidebarEl.insertAdjacentHTML("afterbegin", header());
 const toggles = {
     isDev: "devDependenciesToggleButton",
-    isOptional: "optionalToggleButton"
+    isOptional: "optionalToggleButton",
 };
 Object.entries(toggles).forEach(([toggle, element]) => {
     var _a;
