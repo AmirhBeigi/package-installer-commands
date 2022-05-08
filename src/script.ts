@@ -77,29 +77,29 @@ const getCss = () => `
     transform: translateX(15px);
 }`;
 
-document.head.insertAdjacentHTML("beforeend", `<style>${getCss()}</style>`);
+document.head.insertAdjacentHTML('beforeend', `<style>${getCss()}</style>`);
 
 let togglesState: any = {
-  isDev: false,
-  isOptional: false,
+    isDev: false,
+    isOptional: false
 };
 
 const packageManagers = {
-  installers: {
-    pnpm: "i",
-    yarn: "add",
-    npm: "i",
-  },
-  dev: {
-    pnpm: "-D",
-    yarn: "-D",
-    npm: "-D",
-  },
-  optional: {
-    npm: "-O",
-    yarn: "-O",
-    pnpm: "-O",
-  },
+    installers: {
+        pnpm: 'i',
+        yarn: 'add',
+        npm: 'i'
+    },
+    dev: {
+        pnpm: '-D',
+        yarn: '-D',
+        npm: '-D'
+    },
+    optional: {
+        npm: '-O',
+        yarn: '-O',
+        pnpm: '-O'
+    }
 };
 
 type Manager = keyof typeof packageManagers.installers;
@@ -107,63 +107,63 @@ type Manager = keyof typeof packageManagers.installers;
 const packageManagerNameList = Object.keys(packageManagers.installers) as Manager[];
 
 const sidebarEl = document.querySelector(
-  "#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l"
+    '#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l'
 );
-sidebarEl?.insertAdjacentHTML("afterbegin", `<div id="package-box"></div>`);
-const packageBoxEl = document.getElementById("package-box");
-const packageName = location.pathname.split("/").splice(2).join("/");
-const toastContainer = document.createElement("div");
-toastContainer.id = "toasts";
-document.querySelector("#app > div")?.insertAdjacentElement("afterbegin", toastContainer);
+sidebarEl?.insertAdjacentHTML('afterbegin', `<div id="package-box"></div>`);
+const packageBoxEl = document.getElementById('package-box');
+const packageName = location.pathname.split('/').splice(2).join('/');
+const toastContainer = document.createElement('div');
+toastContainer.id = 'toasts';
+document.querySelector('#app > div')?.insertAdjacentElement('afterbegin', toastContainer);
 
 const cleanUp = () => {
-  document
-    .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p")
-    ?.remove();
-  document
-    .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3")
-    ?.remove();
+    document
+        .querySelector('#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p')
+        ?.remove();
+    document
+        .querySelector('#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3')
+        ?.remove();
 };
 
 cleanUp();
 function generateCommand(
-  manager: Manager,
-  options: { isDev: boolean; isOptional: boolean } = {
-    isDev: togglesState.isDev,
-    isOptional: togglesState.isOptional,
-  }
+    manager: Manager,
+    options: { isDev: boolean; isOptional: boolean } = {
+        isDev: togglesState.isDev,
+        isOptional: togglesState.isOptional
+    }
 ) {
-  let commands: string[] = [manager, packageManagers.installers[manager]];
-  if (options.isDev) commands.push(packageManagers.dev[manager]);
-  if (options.isOptional) commands.push(packageManagers.optional[manager] || "");
-  commands.push(packageName);
-  return commands.join(" ");
+    let commands: string[] = [manager, packageManagers.installers[manager]];
+    if (options.isDev) commands.push(packageManagers.dev[manager]);
+    if (options.isOptional) commands.push(packageManagers.optional[manager] || '');
+    commands.push(packageName);
+    return commands.join(' ');
 }
 const copyToClipboard = (str: string) => {
-  if (navigator && navigator.clipboard && navigator.clipboard.writeText)
-    return navigator.clipboard.writeText(str);
-  const el = document.createElement("textarea");
-  el.value = str;
-  el.setAttribute("readonly", "");
-  el.style.position = "absolute";
-  el.style.left = "-9999px";
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand("copy");
-  document.body.removeChild(el);
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText)
+        return navigator.clipboard.writeText(str);
+    const el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
 };
 
 const toast = ({ text }: { text: string }) => {
-  const toast = document.createElement("div");
-  toast.classList.add("toast");
-  toast.innerHTML = `<pre>${text}</pre>`;
-  toastContainer.appendChild(toast);
-  toast.addEventListener("click", () => {
-    toast.remove();
-  });
-  setTimeout(() => {
-    toast.remove();
-  }, 2000);
+    const toast = document.createElement('div');
+    toast.classList.add('toast');
+    toast.innerHTML = `<pre>${text}</pre>`;
+    toastContainer.appendChild(toast);
+    toast.addEventListener('click', () => {
+        toast.remove();
+    });
+    setTimeout(() => {
+        toast.remove();
+    }, 2000);
 };
 
 const isDevSwitchButton = () => `<label class="switch">
@@ -184,9 +184,9 @@ const header = () => `<div class="flex justify-between items-center">
 </div>`;
 
 const renderInstallPackageBox = (manager: Manager) => {
-  const command = generateCommand(manager);
+    const command = generateCommand(manager);
 
-  return `<p id="${manager}-box" class="d767adf4 lh-copy truncate ph0 mb3 black-80 b5be2af6 f6 flex flex-row">
+    return `<p id="${manager}-box" class="d767adf4 lh-copy truncate ph0 mb3 black-80 b5be2af6 f6 flex flex-row">
     <svg viewBox="0 0 12.32 9.33"><g><line class="st1" x1="7.6" y1="8.9" x2="7.6" y2="6.9"></line><rect width="1.9" height="1.9"></rect><rect x="1.9" y="1.9" width="1.9" height="1.9"></rect><rect x="3.7" y="3.7" width="1.9" height="1.9"></rect><rect x="1.9" y="5.6" width="1.9" height="1.9"></rect><rect y="7.5" width="1.9" height="1.9"></rect></g></svg>
     <code class="flex-auto truncate db" title="Copy Command to Clipboard">
     <span role="button" tabindex="0">${command}</span>
@@ -196,32 +196,32 @@ const renderInstallPackageBox = (manager: Manager) => {
 };
 
 const installPackageBoxes = () => {
-  packageManagerNameList.map((manager: Manager) => {
-    document.getElementById(`${manager}-box`)?.remove();
+    packageManagerNameList.map((manager: Manager) => {
+        document.getElementById(`${manager}-box`)?.remove();
 
-    packageBoxEl?.insertAdjacentHTML("afterbegin", renderInstallPackageBox(manager));
-    const command = generateCommand(manager);
-    return document.getElementById(`${manager}-box`)?.addEventListener("click", () =>
-      copyToClipboard(command)?.then(() =>
-        toast({
-          text: `Copied '${command}' to clipboard`,
-        })
-      )
-    );
-  });
+        packageBoxEl?.insertAdjacentHTML('afterbegin', renderInstallPackageBox(manager));
+        const command = generateCommand(manager);
+        return document.getElementById(`${manager}-box`)?.addEventListener('click', () =>
+            copyToClipboard(command)?.then(() =>
+                toast({
+                    text: `Copied '${command}' to clipboard`
+                })
+            )
+        );
+    });
 };
 
 installPackageBoxes();
-sidebarEl?.insertAdjacentHTML("afterbegin", header());
+sidebarEl?.insertAdjacentHTML('afterbegin', header());
 
 type Toggle = keyof typeof toggles;
 const toggles: any = {
-  isDev: "devDependenciesToggleButton",
-  isOptional: "optionalToggleButton",
+    isDev: 'devDependenciesToggleButton',
+    isOptional: 'optionalToggleButton'
 };
 Object.entries(toggles).forEach(([toggle, element]: any) => {
-  document.getElementById(element)?.addEventListener("change", (e: any) => {
-    togglesState[toggle] = e.target.checked;
-    installPackageBoxes();
-  });
+    document.getElementById(element)?.addEventListener('change', (e: any) => {
+        togglesState[toggle] = e.target.checked;
+        installPackageBoxes();
+    });
 });

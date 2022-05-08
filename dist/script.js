@@ -78,75 +78,75 @@ const getCss = () => `
     -ms-transform: translateX(15px);
     transform: translateX(15px);
 }`;
-document.head.insertAdjacentHTML("beforeend", `<style>${getCss()}</style>`);
+document.head.insertAdjacentHTML('beforeend', `<style>${getCss()}</style>`);
 let togglesState = {
     isDev: false,
-    isOptional: false,
+    isOptional: false
 };
 const packageManagers = {
     installers: {
-        pnpm: "i",
-        yarn: "add",
-        npm: "i",
+        pnpm: 'i',
+        yarn: 'add',
+        npm: 'i'
     },
     dev: {
-        pnpm: "-D",
-        yarn: "-D",
-        npm: "-D",
+        pnpm: '-D',
+        yarn: '-D',
+        npm: '-D'
     },
     optional: {
-        npm: "-O",
-        yarn: "-O",
-        pnpm: "-O",
-    },
+        npm: '-O',
+        yarn: '-O',
+        pnpm: '-O'
+    }
 };
 const packageManagerNameList = Object.keys(packageManagers.installers);
-const sidebarEl = document.querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l");
-sidebarEl === null || sidebarEl === void 0 ? void 0 : sidebarEl.insertAdjacentHTML("afterbegin", `<div id="package-box"></div>`);
-const packageBoxEl = document.getElementById("package-box");
-const packageName = location.pathname.split("/").splice(2).join("/");
-const toastContainer = document.createElement("div");
-toastContainer.id = "toasts";
-(_a = document.querySelector("#app > div")) === null || _a === void 0 ? void 0 : _a.insertAdjacentElement("afterbegin", toastContainer);
+const sidebarEl = document.querySelector('#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l');
+sidebarEl === null || sidebarEl === void 0 ? void 0 : sidebarEl.insertAdjacentHTML('afterbegin', `<div id="package-box"></div>`);
+const packageBoxEl = document.getElementById('package-box');
+const packageName = location.pathname.split('/').splice(2).join('/');
+const toastContainer = document.createElement('div');
+toastContainer.id = 'toasts';
+(_a = document.querySelector('#app > div')) === null || _a === void 0 ? void 0 : _a.insertAdjacentElement('afterbegin', toastContainer);
 const cleanUp = () => {
     var _a, _b;
     (_a = document
-        .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p")) === null || _a === void 0 ? void 0 : _a.remove();
+        .querySelector('#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > p')) === null || _a === void 0 ? void 0 : _a.remove();
     (_b = document
-        .querySelector("#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3")) === null || _b === void 0 ? void 0 : _b.remove();
+        .querySelector('#top > div.fdbf4038.w-third-l.mt3.w-100.ph3.ph4-m.pv3.pv0-l > h3')) === null || _b === void 0 ? void 0 : _b.remove();
 };
 cleanUp();
 function generateCommand(manager, options = {
     isDev: togglesState.isDev,
-    isOptional: togglesState.isOptional,
+    isOptional: togglesState.isOptional
 }) {
     let commands = [manager, packageManagers.installers[manager]];
     if (options.isDev)
         commands.push(packageManagers.dev[manager]);
     if (options.isOptional)
-        commands.push(packageManagers.optional[manager] || "");
+        commands.push(packageManagers.optional[manager] || '');
     commands.push(packageName);
-    return commands.join(" ");
+    return commands.join(' ');
 }
 const copyToClipboard = (str) => {
     if (navigator && navigator.clipboard && navigator.clipboard.writeText)
         return navigator.clipboard.writeText(str);
-    const el = document.createElement("textarea");
+    const el = document.createElement('textarea');
     el.value = str;
-    el.setAttribute("readonly", "");
-    el.style.position = "absolute";
-    el.style.left = "-9999px";
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
     document.body.appendChild(el);
     el.select();
-    document.execCommand("copy");
+    document.execCommand('copy');
     document.body.removeChild(el);
 };
 const toast = ({ text }) => {
-    const toast = document.createElement("div");
-    toast.classList.add("toast");
+    const toast = document.createElement('div');
+    toast.classList.add('toast');
     toast.innerHTML = `<pre>${text}</pre>`;
     toastContainer.appendChild(toast);
-    toast.addEventListener("click", () => {
+    toast.addEventListener('click', () => {
         toast.remove();
     });
     setTimeout(() => {
@@ -182,25 +182,25 @@ const installPackageBoxes = () => {
     packageManagerNameList.map((manager) => {
         var _a, _b;
         (_a = document.getElementById(`${manager}-box`)) === null || _a === void 0 ? void 0 : _a.remove();
-        packageBoxEl === null || packageBoxEl === void 0 ? void 0 : packageBoxEl.insertAdjacentHTML("afterbegin", renderInstallPackageBox(manager));
+        packageBoxEl === null || packageBoxEl === void 0 ? void 0 : packageBoxEl.insertAdjacentHTML('afterbegin', renderInstallPackageBox(manager));
         const command = generateCommand(manager);
-        return (_b = document.getElementById(`${manager}-box`)) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
+        return (_b = document.getElementById(`${manager}-box`)) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => {
             var _a;
             return (_a = copyToClipboard(command)) === null || _a === void 0 ? void 0 : _a.then(() => toast({
-                text: `Copied '${command}' to clipboard`,
+                text: `Copied '${command}' to clipboard`
             }));
         });
     });
 };
 installPackageBoxes();
-sidebarEl === null || sidebarEl === void 0 ? void 0 : sidebarEl.insertAdjacentHTML("afterbegin", header());
+sidebarEl === null || sidebarEl === void 0 ? void 0 : sidebarEl.insertAdjacentHTML('afterbegin', header());
 const toggles = {
-    isDev: "devDependenciesToggleButton",
-    isOptional: "optionalToggleButton",
+    isDev: 'devDependenciesToggleButton',
+    isOptional: 'optionalToggleButton'
 };
 Object.entries(toggles).forEach(([toggle, element]) => {
     var _a;
-    (_a = document.getElementById(element)) === null || _a === void 0 ? void 0 : _a.addEventListener("change", (e) => {
+    (_a = document.getElementById(element)) === null || _a === void 0 ? void 0 : _a.addEventListener('change', (e) => {
         togglesState[toggle] = e.target.checked;
         installPackageBoxes();
     });
